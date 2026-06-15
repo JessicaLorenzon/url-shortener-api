@@ -4,6 +4,7 @@ import com.lorenzon.url_shortener_api.dtos.UrlRequestDTO;
 import com.lorenzon.url_shortener_api.dtos.UrlResponseDTO;
 import com.lorenzon.url_shortener_api.dtos.UrlStatisticsDTO;
 import com.lorenzon.url_shortener_api.entities.Url;
+import com.lorenzon.url_shortener_api.exceptions.ShortCodeNotFoundException;
 import com.lorenzon.url_shortener_api.repositories.UrlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,12 +36,18 @@ public class UrlService {
     @Transactional(readOnly = true)
     public UrlResponseDTO findByShortCode(String shortCode) {
         Url url = urlRepository.findByShortCode(shortCode);
+        if (url == null) {
+            throw new ShortCodeNotFoundException(shortCode);
+        }
         return new UrlResponseDTO(url);
     }
 
     @Transactional
     public UrlResponseDTO update(String shortCode, UrlRequestDTO requestDTO) {
         Url url = urlRepository.findByShortCode(shortCode);
+        if (url == null) {
+            throw new ShortCodeNotFoundException(shortCode);
+        }
         url.setOriginalUrl(requestDTO.originalUrl());
         url.setShortCode(generateShortCode());
         url = urlRepository.save(url);
@@ -49,12 +56,19 @@ public class UrlService {
 
     @Transactional
     public void deleteByShortCode(String shortCode) {
-        urlRepository.deleteByShortCode(shortCode);
+        Url url = urlRepository.findByShortCode(shortCode);
+        if (url == null) {
+            throw new ShortCodeNotFoundException(shortCode);
+        }
+        urlRepository.delete(url);
     }
 
     @Transactional(readOnly = true)
     public UrlStatisticsDTO showStatistics(String shortCode) {
         Url url = urlRepository.findByShortCode(shortCode);
+        if (url == null) {
+            throw new ShortCodeNotFoundException(shortCode);
+        }
         return new UrlStatisticsDTO(url);
     }
 
