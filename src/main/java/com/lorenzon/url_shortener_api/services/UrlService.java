@@ -28,7 +28,7 @@ public class UrlService {
     public UrlResponseDTO insert(UrlRequestDTO requestDTO) {
         Url url = new Url();
         url.setOriginalUrl(requestDTO.originalUrl());
-        url.setShortCode(generateShortCode());
+        url.setShortCode(generateUniqueShortCode());
         urlRepository.save(url);
         return new UrlResponseDTO(url);
     }
@@ -63,6 +63,16 @@ public class UrlService {
                 .orElseThrow(() -> new ShortCodeNotFoundException(shortCode));
     }
 
+    private String generateUniqueShortCode() {
+        String shortCode = generateShortCode();
+
+        while (urlRepository.existsByShortCode(shortCode)) {
+            shortCode = generateShortCode();
+        }
+
+        return shortCode;
+    }
+
     private String generateShortCode() {
         String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         int cnt = 6;
@@ -71,6 +81,7 @@ public class UrlService {
         for (int i = 0; i < cnt; i++) {
             ret[i] = chars.charAt((int) (Math.random() * chars.length()));
         }
+
         return new String(ret);
     }
 }
