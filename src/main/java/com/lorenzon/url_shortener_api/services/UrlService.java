@@ -35,41 +35,32 @@ public class UrlService {
 
     @Transactional(readOnly = true)
     public UrlResponseDTO findByShortCode(String shortCode) {
-        Url url = urlRepository.findByShortCode(shortCode);
-        if (url == null) {
-            throw new ShortCodeNotFoundException(shortCode);
-        }
+        Url url = findUrlByShortCode(shortCode);
         return new UrlResponseDTO(url);
     }
 
     @Transactional
     public UrlResponseDTO update(String shortCode, UrlRequestDTO requestDTO) {
-        Url url = urlRepository.findByShortCode(shortCode);
-        if (url == null) {
-            throw new ShortCodeNotFoundException(shortCode);
-        }
+        Url url = findUrlByShortCode(shortCode);
         url.setOriginalUrl(requestDTO.originalUrl());
-        url.setShortCode(generateShortCode());
-        url = urlRepository.save(url);
         return new UrlResponseDTO(url);
     }
 
     @Transactional
     public void deleteByShortCode(String shortCode) {
-        Url url = urlRepository.findByShortCode(shortCode);
-        if (url == null) {
-            throw new ShortCodeNotFoundException(shortCode);
-        }
+        Url url = findUrlByShortCode(shortCode);
         urlRepository.delete(url);
     }
 
     @Transactional(readOnly = true)
     public UrlStatisticsDTO showStatistics(String shortCode) {
-        Url url = urlRepository.findByShortCode(shortCode);
-        if (url == null) {
-            throw new ShortCodeNotFoundException(shortCode);
-        }
+        Url url = findUrlByShortCode(shortCode);
         return new UrlStatisticsDTO(url);
+    }
+
+    private Url findUrlByShortCode(String shortCode) {
+        return urlRepository.findByShortCode(shortCode)
+                .orElseThrow(() -> new ShortCodeNotFoundException(shortCode));
     }
 
     private String generateShortCode() {

@@ -21,6 +21,8 @@ public class Url {
     private Long id;
 
     private String originalUrl;
+
+    @Column(unique = true)
     private String shortCode;
 
     @Column(updatable = false)
