@@ -32,5 +32,6 @@ public class Url {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    private Long accessCount;
+    @Column(nullable = false)
+    private Long accessCount = 0L;
 }

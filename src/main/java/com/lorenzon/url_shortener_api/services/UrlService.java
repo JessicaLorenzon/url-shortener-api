@@ -18,6 +18,13 @@ public class UrlService {
     @Autowired
     private UrlRepository urlRepository;
 
+    @Transactional
+    public String getOriginalUrlAndTrackAccess(String shortCode) {
+        Url url = findUrlByShortCode(shortCode);
+        url.setAccessCount(url.getAccessCount() + 1L);
+        return url.getOriginalUrl();
+    }
+
     @Transactional(readOnly = true)
     public List<UrlResponseDTO> findAll() {
         List<Url> urls = urlRepository.findAll();
@@ -29,7 +36,7 @@ public class UrlService {
         Url url = new Url();
         url.setOriginalUrl(requestDTO.originalUrl());
         url.setShortCode(generateUniqueShortCode());
-        urlRepository.save(url);
+        url = urlRepository.save(url);
         return new UrlResponseDTO(url);
     }
 
