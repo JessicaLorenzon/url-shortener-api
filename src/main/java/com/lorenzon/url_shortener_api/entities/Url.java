@@ -34,4 +34,10 @@ public class Url {
 
     @Column(nullable = false)
     private Long accessCount = 0L;
+
+    public Url(Long id, String originalUrl, String shortCode) {
+        this.id = id;
+        this.originalUrl = originalUrl;
+        this.shortCode = shortCode;
+    }
 }
